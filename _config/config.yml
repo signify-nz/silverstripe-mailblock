@@ -1,0 +1,10 @@
+---
+Name: mailblockconfig
+After:
+  - 'framework/*'
+  - 'cms/*'
+---
+
+SiteConfig:
+  extensions:
+    - MailblockSiteConfig
