@@ -22,9 +22,9 @@ class MailblockMailer extends Mailer {
 	public function sendPlain($to, $from, $subject, $plainContent,
 		$attachedFiles = array(), $customHeaders = array()
 	) {
-		$to = $this->mailblockRewrite($to);
-		parent::sendPlain($to, $from, $subject, $plainContent, $attachedFiles,
-			$customHeaders
+		$rewrites = $this->mailblockRewrite($to, $subject);
+		parent::sendPlain($rewrites['to'], $from, $rewrites['subject'],
+			$plainContent, $attachedFiles, $customHeaders
 		);
 	}
 
@@ -44,9 +44,9 @@ class MailblockMailer extends Mailer {
 	public function sendHTML($to, $from, $subject, $htmlContent,
 		$attachedFiles = array(), $customHeaders = array(), $plainContent = ''
 	) {
-		$to = $this->mailblockRewrite($to);
-		parent::sendHTML($to, $from, $subject, $htmlContent, $attachedFiles,
-			$customHeaders, $plainContent
+		$rewrites = $this->mailblockRewrite($to, $subject);
+		parent::sendHTML($rewrites['to'], $from, $rewrites['subject'],
+			$htmlContent, $attachedFiles, $customHeaders, $plainContent
 		);
 	}
 
@@ -55,9 +55,9 @@ class MailblockMailer extends Mailer {
 	 *
 	 * @param string $recipients Original email recipients.
 	 * @param string $subject Original email subject.
-	 * @return string New email recients.
+	 * @return array Rewritten subject and recipients.
 	 */
-	private function mailblockRewrite($recipients, $subject = '') {
+	private function mailblockRewrite($recipients, $subject) {
 		$siteConfig = SiteConfig::current_site_config();
 		$enabled = $siteConfig->getField('MailblockEnabled');
 		$enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
@@ -65,12 +65,24 @@ class MailblockMailer extends Mailer {
 
 		if ($enabled && ($enabledOnLive || $environment != 'live')) {
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
-			if (!empty($mailblockRecipients)) {
+			// Rewrite subject if 'send_all_emails_to' is not set.
+			// If it is set, the subject has already been rewritten.
+			if(!Config::inst()->get('Email', 'send_all_emails_to')) {
+				$subject .= " [addressed to $recipients";
+				// @TODO BCC/CC
+				$subject .= ']';
+			}
+			if(!empty($mailblockRecipients)) {
 				$recipients = implode(', ', preg_split("/\r\n|\n|\r/",
 					$mailblockRecipients
 				));
 			}
 		}
-		return $recipients;
+
+		$rewrites = array(
+			'to'      => $recipients,
+			'subject' => $subject,
+		);
+		return $rewrites;
 	}
 }
