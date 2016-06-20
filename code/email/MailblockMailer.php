@@ -61,13 +61,19 @@ class MailblockMailer extends Mailer {
 		$siteConfig = SiteConfig::current_site_config();
 		$enabled = $siteConfig->getField('MailblockEnabled');
 		$enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
+		$overrideConfiguration = $siteConfig
+			->getField('MailblockOverrideConfiguration');
+		$configuration = Config::inst()->get('Email', 'send_all_emails_to');
+
 		$environment = SS_ENVIRONMENT_TYPE;
 
-		if ($enabled && ($enabledOnLive || $environment != 'live')) {
+		if($enabled && ($enabledOnLive || $environment != 'live')
+		   && (!$configuration || $overrideConfiguration)
+		) {
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 			// Rewrite subject if 'send_all_emails_to' is not set.
 			// If it is set, the subject has already been rewritten.
-			if(!Config::inst()->get('Email', 'send_all_emails_to')) {
+			if(!$configuration) {
 				$subject .= " [addressed to $recipients";
 				// @TODO BCC/CC
 				$subject .= ']';

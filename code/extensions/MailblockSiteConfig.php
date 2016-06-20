@@ -9,9 +9,10 @@
 class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 
 	private static $db = array(
-		'MailblockEnabled'        => 'Boolean',
-		'MailblockEnabledOnLive' => 'Boolean',
-		'MailblockRecipients'     => 'Text',
+		'MailblockEnabled'               => 'Boolean',
+		'MailblockEnabledOnLive'         => 'Boolean',
+		'MailblockOverrideConfiguration' => 'Boolean',
+		'MailblockRecipients'            => 'Text',
 	);
 
 	public function validate(ValidationResult $validationResult) {
@@ -48,7 +49,20 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			);
 			$enableOnLive->setDescription(_t('Mailblock.EnabledOnLiveDescription',
 				'Whether messages sent via the MailblockMailer should be '
-			  . ' redirected to the below recipient(s). Useful for prelive sites.'
+			  . 'redirected to the below recipient(s). Useful for prelive sites.'
+			));
+			$fields->addFieldToTab(
+				'Root.Mailblock',
+				$overrideConfiguration = CheckboxField::create(
+						'MailblockOverrideConfiguration',
+						_t('Mailblock.OverrideConfiguration',
+							'Override configuration settings.'
+						)
+				)
+			);
+			$overrideConfiguration->setDescription(_t('Mailblock.OverrideConfigurationDescription',
+				'Whether mailblock should override the hard coded Email class '
+			  . '\'send_all_emails_to\' configuration setting.'
 			));
 
 			$fields->addFieldToTab(
