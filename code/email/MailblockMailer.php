@@ -78,11 +78,9 @@ class MailblockMailer extends Mailer {
 				// @TODO BCC/CC
 				$subject .= ']';
 			}
-			if(!empty($mailblockRecipients)) {
-				$recipients = implode(', ', preg_split("/\r\n|\n|\r/",
-					$mailblockRecipients
-				));
-			}
+			$recipients = implode(', ', preg_split("/\r\n|\n|\r/",
+				$mailblockRecipients
+			));
 		}
 
 		$rewrites = array(
