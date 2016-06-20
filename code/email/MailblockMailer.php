@@ -22,16 +22,9 @@ class MailblockMailer extends Mailer {
 	public function sendPlain($to, $from, $subject, $plainContent,
 		$attachedFiles = array(), $customHeaders = array()
 	) {
-		// Prepare plain text body
-		$fullBody = $this->encodeMessage($plainContent, $this->getMessageEncoding());
-		$headers["Content-Type"] = "text/plain; charset=utf-8";
-		$headers["Content-Transfer-Encoding"] = $this->getMessageEncoding();
-
 		$to = $this->mailblockRewrite($to);
-
-		// Send prepared message
-		return $this->sendPreparedMessage($to, $from, $subject, $attachedFiles,
-			$customHeaders, $fullBody, $headers
+		parent::sendPlain($to, $from, $subject, $plainContent, $attachedFiles,
+			$customHeaders
 		);
 	}
 
@@ -51,19 +44,9 @@ class MailblockMailer extends Mailer {
 	public function sendHTML($to, $from, $subject, $htmlContent,
 		$attachedFiles = array(), $customHeaders = array(), $plainContent = ''
 	) {
-		// Prepare both Plain and HTML components and merge
-		$plainPart = $this->preparePlainSubmessage($plainContent, $htmlContent);
-		$htmlPart = $this->prepareHTMLSubmessage($htmlContent);
-		list($fullBody, $headers) = $this->encodeMultipart(
-				array($plainPart, $htmlPart),
-				"multipart/alternative"
-		);
-
 		$to = $this->mailblockRewrite($to);
-
-		// Send prepared message
-		return $this->sendPreparedMessage($to, $from, $subject, $attachedFiles,
-			$customHeaders, $fullBody, $headers
+		parent::sendHTML($to, $from, $subject, $htmlContent, $attachedFiles,
+			$customHeaders, $plainContent
 		);
 	}
 
