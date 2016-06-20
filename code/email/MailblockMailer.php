@@ -76,7 +76,10 @@ class MailblockMailer extends Mailer {
 	private function mailblockRecipients($recipients) {
 		$siteConfig = SiteConfig::current_site_config();
 		$enabled = $siteConfig->getField('MailblockEnabled');
-		if ($enabled) {
+		$enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
+		$environment = SS_ENVIRONMENT_TYPE;
+
+		if ($enabled && ($enabledOnLive || $environment != 'live')) {
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 			if (!empty($mailblockRecipients)) {
 				$recipients = implode(', ', preg_split("/\r\n|\n|\r/",

@@ -9,8 +9,9 @@
 class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 
 	private static $db = array(
-		'MailblockEnabled'    => 'Boolean',
-		'MailblockRecipients' => 'Text',
+		'MailblockEnabled'        => 'Boolean',
+		'MailblockEnabledOnLive' => 'Boolean',
+		'MailblockRecipients'     => 'Text',
 	);
 
 	public function validate(ValidationResult $validationResult) {
@@ -19,7 +20,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			$recipients = preg_split("/\r\n|\n|\r/", $mailblockRecipients);
 			foreach ($recipients as $recipient) {
 				if (!Email::validEmailAddress($recipient)) {
-					$validationResult->error(_t('MailblockConfig.RecipientError',
+					$validationResult->error(_t('Mailblock.RecipientError',
 						'All Mailblock recipients are not valid email addresses.'
 					));
 				}
@@ -33,20 +34,33 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 				'Root.Mailblock',
 				$enable = CheckboxField::create(
 					'MailblockEnabled',
-					_t('MailblockConfig.Enabled','Enable mailblock.')
+					_t('Mailblock.Enabled','Enable mailblock.')
 				)
 			);
+			$fields->addFieldToTab(
+				'Root.Mailblock',
+				$enableOnLive = CheckboxField::create(
+					'MailblockEnabledOnLive',
+					_t('Mailblock.EnabledOnLive',
+						'Enable mailblock on live site.'
+					)
+				)
+			);
+			$enableOnLive->setDescription(_t('Mailblock.EnabledOnLiveDescription',
+				'Whether messages sent via the MailblockMailer should be '
+			  . ' redirected to the below recipient(s). Useful for prelive sites.'
+			));
 
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$recipients = TextareaField::create(
 					'MailblockRecipients',
-					_t('MailblockConfig.Recipients',
+					_t('Mailblock.Recipients',
 						'Recipient(s) for out-going mail'
 					)
 				)
 			);
-			$recipients->setDescription(_t('MailblockConfig.Recipients',
+			$recipients->setDescription(_t('Mailblock.RecipientsDescription',
 				'Redirect messages sent via the MailblockMailer to these '
 			  . 'addresses (one per line).'
 			));
