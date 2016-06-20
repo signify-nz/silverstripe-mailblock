@@ -8,3 +8,6 @@ After:
 SiteConfig:
   extensions:
     - MailblockSiteConfig
+Injector:
+  Mailer:
+    class: MailblockMailer

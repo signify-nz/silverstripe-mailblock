@@ -1,15 +1,16 @@
 <?php
+
 /**
  * Adds a mailblock section to the 'Settings' section of the CMS.
  *
  * @package silverstripe-mailblock
  * @subpackage extensions
  */
-
 class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 
 	private static $db = array(
-		'MailblockEnabled' => 'Boolean',
+		'MailblockEnabled'    => 'Boolean',
+		'MailblockRecipients' => 'Text',
 	);
 
 	public function updateCMSFields(FieldList $fields) {
@@ -19,6 +20,15 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 				$enable = CheckboxField::create(
 					'MailblockEnabled',
 					_t('MailblockConfig.Enabled','Enable mailblock.')
+				)
+			);
+			$fields->addFieldToTab(
+				'Root.Mailblock',
+				$recipients = TextareaField::create(
+					'MailblockRecipients',
+					_t('MailblockConfig.Recipients',
+						'Recipient(s) for out-going mail'
+					)
 				)
 			);
 		}
