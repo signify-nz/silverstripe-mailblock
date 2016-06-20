@@ -27,7 +27,7 @@ class MailblockMailer extends Mailer {
 		$headers["Content-Type"] = "text/plain; charset=utf-8";
 		$headers["Content-Transfer-Encoding"] = $this->getMessageEncoding();
 
-		$to = $this->mailblockRecipients($to);
+		$to = $this->mailblockRewrite($to);
 
 		// Send prepared message
 		return $this->sendPreparedMessage($to, $from, $subject, $attachedFiles,
@@ -59,7 +59,7 @@ class MailblockMailer extends Mailer {
 				"multipart/alternative"
 		);
 
-		$to = $this->mailblockRecipients($to);
+		$to = $this->mailblockRewrite($to);
 
 		// Send prepared message
 		return $this->sendPreparedMessage($to, $from, $subject, $attachedFiles,
@@ -71,9 +71,10 @@ class MailblockMailer extends Mailer {
 	 * Replace the recipients with the recipients entered in Mailblock.
 	 *
 	 * @param string $recipients Original email recipients.
+	 * @param string $subject Original email subject.
 	 * @return string New email recients.
 	 */
-	private function mailblockRecipients($recipients) {
+	private function mailblockRewrite($recipients, $subject = '') {
 		$siteConfig = SiteConfig::current_site_config();
 		$enabled = $siteConfig->getField('MailblockEnabled');
 		$enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
