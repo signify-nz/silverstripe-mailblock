@@ -82,7 +82,6 @@ class MailblockMailer extends Mailer {
 				$recipients = $mailblockRecipients;
 			}
 		}
-
 		return $recipients;
 	}
 }

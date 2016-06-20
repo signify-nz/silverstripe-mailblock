@@ -13,6 +13,20 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		'MailblockRecipients' => 'Text',
 	);
 
+	public function validate(ValidationResult $validationResult) {
+		$mailblockRecipients = $this->owner->getField('MailblockRecipients');
+		if (!empty($mailblockRecipients)) {
+			$recipients = preg_split("/\r\n|\n|\r/", $mailblockRecipients);
+			foreach ($recipients as $recipient) {
+				if (!Email::validEmailAddress($recipient)) {
+					$validationResult->error(_t('MailblockConfig.RecipientError',
+						'All Mailblock recipients are not valid email addresses.'
+					));
+				}
+			}
+		}
+	}
+
 	public function updateCMSFields(FieldList $fields) {
 		if(Permission::checkMember($member, 'MANAGE_MAILBLOCK')) {
 			$fields->addFieldToTab(
@@ -22,6 +36,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 					_t('MailblockConfig.Enabled','Enable mailblock.')
 				)
 			);
+
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$recipients = TextareaField::create(
@@ -31,6 +46,10 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 					)
 				)
 			);
+			$recipients->setDescription(_t('MailblockConfig.Recipients',
+				'Redirect messages sent via the MailblockMailer to these '
+			  . 'addresses (one per line).'
+			));
 		}
 	}
 
