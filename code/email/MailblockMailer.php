@@ -79,7 +79,9 @@ class MailblockMailer extends Mailer {
 		if ($enabled) {
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 			if (!empty($mailblockRecipients)) {
-				$recipients = $mailblockRecipients;
+				$recipients = implode(', ', preg_split("/\r\n|\n|\r/",
+					$mailblockRecipients
+				));
 			}
 		}
 		return $recipients;
