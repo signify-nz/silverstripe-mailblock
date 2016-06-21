@@ -10,6 +10,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 
 	private static $db = array(
 		'MailblockEnabled'               => 'Boolean',
+		'MailblockApplyPerSubsite'       => 'Boolean',
 		'MailblockEnabledOnLive'         => 'Boolean',
 		'MailblockOverrideConfiguration' => 'Boolean',
 		'MailblockRecipients'            => 'Text',
@@ -30,7 +31,24 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 	}
 
 	public function updateCMSFields(FieldList $fields) {
-		if(Permission::checkMember($member, 'MANAGE_MAILBLOCK')) {
+		$subsites = class_exists('Subsite');
+		$onMainSite = TRUE;
+		$currentSubsiteID = 0;
+		if ($subsites) {
+			$currentSubsiteID = Subsite::currentSubsiteID();
+			if ($currentSubsiteID) {
+				$onMainSite = FALSE;
+			}
+			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
+		}
+		else {
+			$mainSiteConfig = SiteConfig::current_site_config();
+		}
+
+		// Add mailblock CMS fields.
+		if(Permission::checkMember($member, 'MANAGE_MAILBLOCK')
+		   && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
+		) {
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$enable = CheckboxField::create(
@@ -38,6 +56,26 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 					_t('Mailblock.Enabled','Enable mailblock.')
 				)
 			);
+			if($subsites) {
+				if($currentSubsiteID == 0) {
+					$fields->addFieldToTab(
+						'Root.Mailblock',
+						$applyPerSubsite = CheckboxField::create(
+							'MailblockApplyPerSubsite',
+							_t('Mailblock.ApplyPerSubsite',
+									'Apply mailblock settings per subsite.'
+							)
+						)
+					);
+					$applyPerSubsite->setDescription(
+						_t('Mailblock.ApplyPerSubsiteDescription',
+							'If ticked then different mailblock settings appply '
+						  . 'per subsite rather than globally.'
+						)
+					);
+				}
+			}
+
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$enableOnLive = CheckboxField::create(
@@ -90,7 +128,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		return array(
 			'MANAGE_MAILBLOCK' => array(
 				'name'     => _t('Mailblock.ADMIN_PERMISSION',
-					"Access to 'Mailblock' settings"
+					'Access to \'Mailblock\' settings'
 				),
 				'category' => _t('Permission.CMS_ACCESS_CATEGORY',
 					'CMS Access'

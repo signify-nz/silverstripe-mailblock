@@ -58,7 +58,20 @@ class MailblockMailer extends Mailer {
 	 * @return array Rewritten subject and recipients.
 	 */
 	private function mailblockRewrite($recipients, $subject) {
-		$siteConfig = SiteConfig::current_site_config();
+
+		if (class_exists('Subsite')) {
+			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
+		}
+		else {
+			$mainSiteConfig = SiteConfig::current_site_config();
+		}
+		if ($mainSiteConfig->getField('MailblockApplyPerSubsite')) {
+			$siteConfig = SiteConfig::current_site_config();
+		}
+		else {
+			$siteConfig = $mainSiteConfig;
+		}
+
 		$enabled = $siteConfig->getField('MailblockEnabled');
 		$enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
 		$overrideConfiguration = $siteConfig
