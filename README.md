@@ -14,3 +14,5 @@ If you prefer you may also install manually:
 
 ## Usage
 All options are in the Settings -> Mailblock section of the CMS. Only users with the "Access to 'Mailblock' settings" permission will be able to configure Mailblock.
+
+[User Guide](/docs/en/user_guide.md)
