@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Adds a mailblock section to the 'Settings' section of the CMS.
+ * Mailblock mailer that allows email message redirection.
  *
  * @package silverstripe-mailblock
- * @subpackage extensions
+ * @subpackage email
  */
 class MailblockMailer extends Mailer {
 
@@ -58,7 +58,6 @@ class MailblockMailer extends Mailer {
 	 * @return array Rewritten subject and recipients.
 	 */
 	private function mailblockRewrite($recipients, $subject) {
-
 		if (class_exists('Subsite')) {
 			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
 		}
@@ -78,9 +77,7 @@ class MailblockMailer extends Mailer {
 			->getField('MailblockOverrideConfiguration');
 		$configuration = Config::inst()->get('Email', 'send_all_emails_to');
 
-		$environment = SS_ENVIRONMENT_TYPE;
-
-		if($enabled && ($enabledOnLive || $environment != 'live')
+		if($enabled && ($enabledOnLive || SS_ENVIRONMENT_TYPE != 'live')
 		   && (!$configuration || $overrideConfiguration)
 		) {
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
