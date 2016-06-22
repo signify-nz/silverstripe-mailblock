@@ -22,9 +22,9 @@ class MailblockMailer extends Mailer {
 	public function sendPlain($to, $from, $subject, $plainContent,
 		$attachedFiles = array(), $customHeaders = array()
 	) {
-		$rewrites = $this->mailblockRewrite($to, $subject);
+		$rewrites = $this->mailblockRewrite($to, $subject, $customHeaders);
 		parent::sendPlain($rewrites['to'], $from, $rewrites['subject'],
-			$plainContent, $attachedFiles, $customHeaders
+			$plainContent, $attachedFiles, $rewrites['headers']
 		);
 	}
 
@@ -44,9 +44,9 @@ class MailblockMailer extends Mailer {
 	public function sendHTML($to, $from, $subject, $htmlContent,
 		$attachedFiles = array(), $customHeaders = array(), $plainContent = ''
 	) {
-		$rewrites = $this->mailblockRewrite($to, $subject);
+		$rewrites = $this->mailblockRewrite($to, $subject, $customHeaders);
 		parent::sendHTML($rewrites['to'], $from, $rewrites['subject'],
-			$htmlContent, $attachedFiles, $customHeaders, $plainContent
+			$htmlContent, $attachedFiles, $rewrites['headers'], $plainContent
 		);
 	}
 
@@ -57,7 +57,8 @@ class MailblockMailer extends Mailer {
 	 * @param string $subject Original email subject.
 	 * @return array Rewritten subject and recipients.
 	 */
-	protected function mailblockRewrite($recipients, $subject) {
+	protected function mailblockRewrite($recipients, $subject, $customHeaders) {
+		// Get the correct mailblock config.
 		if (class_exists('Subsite')) {
 			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
 		}
@@ -101,11 +102,15 @@ class MailblockMailer extends Mailer {
 					$newRecipients .= ', ' . $whiteListed;
 				}
 			}
+			$recipients = $newRecipients;
+			unset($customHeaders['Cc']);
+			unset($customHeaders['Bcc']);
 		}
 
 		$rewrites = array(
-			'to'      => $newRecipients,
+			'to'      => $recipients,
 			'subject' => $subject,
+			'headers' => $customHeaders,
 		);
 		return $rewrites;
 	}
