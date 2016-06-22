@@ -72,7 +72,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 							'If ticked then different mailblock settings appply '
 						  . 'per subsite rather than globally.'
 						)
-					);
+					)->displayIf('MailblockEnabled')->isChecked();
 				}
 			}
 
@@ -92,10 +92,10 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$overrideConfiguration = CheckboxField::create(
-						'MailblockOverrideConfiguration',
-						_t('Mailblock.OverrideConfiguration',
-							'Override configuration settings.'
-						)
+					'MailblockOverrideConfiguration',
+					_t('Mailblock.OverrideConfiguration',
+						'Override configuration settings.'
+					)
 				)
 			);
 			$overrideConfiguration->setDescription(_t('Mailblock.OverrideConfigurationDescription',
@@ -116,6 +116,15 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 				'Redirect messages sent via the MailblockMailer to these '
 			  . 'addresses (one per line).'
 			));
+
+			$hiddenFields = array(
+				$enableOnLive,
+				$overrideConfiguration,
+				$recipients
+			);
+			foreach ($hiddenFields as $field) {
+				$field->displayIf('MailblockEnabled')->isChecked();
+			}
 		}
 	}
 
