@@ -104,7 +104,7 @@ class TestMailblockMailer extends MailblockMailer {
 	/**
 	 * Clear the log of emails sent
 	 *
-	 * @see SapphireTest::clearEmails()
+	 * @see TestMailer::clearEmails()
 	 */
 	public function clearEmails() {
 		$this->emailsSent = array();
@@ -120,7 +120,7 @@ class TestMailblockMailer extends MailblockMailer {
 	 * @return array Contains the keys: 'type', 'to', 'from', 'subject', 'content', 'plainContent', 'attachedFiles',
 	 *               'customHeaders', 'htmlContent', 'inlineImages'
 	 *
-	 * @see SapphireTest::findEmail()
+	 * @see TestMailer::findEmail()
 	 */
 	public function findEmail($to, $from = null, $subject = null, $content = null) {
 		foreach($this->emailsSent as $email) {
