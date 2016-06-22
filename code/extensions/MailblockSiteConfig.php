@@ -49,6 +49,16 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		if(Permission::check('MANAGE_MAILBLOCK')
 		   && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
 		) {
+			$fields->addFieldsToTab(
+				'Root.Mailblock',
+				$basicSettings = LiteralField::create(
+					'MailblockBasicSettings',
+					'<h3>' . _t('Mailblock.BasicSettings',
+						'Basic Settings'
+					) . '</h3>'
+				)
+			);
+
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$enable = CheckboxField::create(
@@ -56,6 +66,31 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 					_t('Mailblock.Enabled','Enable mailblock.')
 				)
 			);
+
+			$fields->addFieldToTab(
+				'Root.Mailblock',
+				$recipients = TextareaField::create(
+					'MailblockRecipients',
+					_t('Mailblock.Recipients',
+						'Recipient(s) for out-going mail'
+					)
+				)
+			);
+			$recipients->setDescription(_t('Mailblock.RecipientsDescription',
+					'Redirect messages sent via the MailblockMailer to these '
+					. 'addresses (one per line).'
+			));
+
+			$fields->addFieldsToTab(
+				'Root.Mailblock',
+				$advancedSettings =  DisplayLogicWrapper::create(LiteralField::create(
+					'MailblockAdvancedSettings',
+					'<h3>' . _t('Mailblock.AdvancedSettings',
+						'Advanced Settings'
+					) . '</h3>'
+				))
+			);
+
 			if($subsites) {
 				if($currentSubsiteID == 0) {
 					$fields->addFieldToTab(
@@ -89,6 +124,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 				'Whether messages sent via the MailblockMailer should be '
 			  . 'redirected to the below recipient(s). Useful for prelive sites.'
 			));
+
 			$fields->addFieldToTab(
 				'Root.Mailblock',
 				$overrideConfiguration = CheckboxField::create(
@@ -103,24 +139,11 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			  . '\'send_all_emails_to\' configuration setting.'
 			));
 
-			$fields->addFieldToTab(
-				'Root.Mailblock',
-				$recipients = TextareaField::create(
-					'MailblockRecipients',
-					_t('Mailblock.Recipients',
-						'Recipient(s) for out-going mail'
-					)
-				)
-			);
-			$recipients->setDescription(_t('Mailblock.RecipientsDescription',
-				'Redirect messages sent via the MailblockMailer to these '
-			  . 'addresses (one per line).'
-			));
-
 			$hiddenFields = array(
 				$enableOnLive,
 				$overrideConfiguration,
-				$recipients
+				$recipients,
+				$advancedSettings,
 			);
 			foreach ($hiddenFields as $field) {
 				$field->displayIf('MailblockEnabled')->isChecked();
