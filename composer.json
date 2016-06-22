@@ -12,7 +12,8 @@
 		"issues": "http://github.com/signify-nz/silverstripe-mailblock/issues"
 	},
 	"require": {
-		"silverstripe/cms": ">=3.0.1",
-		"silverstripe/framework": ">=3.0.1"
+		"silverstripe/cms": "^3.2",
+		"silverstripe/framework": "^3.2",
+		"unclecheese/display-logic": "^1.3"
 	}
 }
