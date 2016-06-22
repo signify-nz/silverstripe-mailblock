@@ -46,7 +46,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		}
 
 		// Add mailblock CMS fields.
-		if(Permission::checkMember($member, 'MANAGE_MAILBLOCK')
+		if(Permission::check('MANAGE_MAILBLOCK')
 		   && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
 		) {
 			$fields->addFieldToTab(
