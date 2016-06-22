@@ -14,20 +14,35 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		'MailblockEnabledOnLive'         => 'Boolean',
 		'MailblockOverrideConfiguration' => 'Boolean',
 		'MailblockRecipients'            => 'Text',
+		'MailblockWhitelist'             => 'Text',
 	);
 
 	public function validate(ValidationResult $validationResult) {
 		$mailblockRecipients = $this->owner->getField('MailblockRecipients');
-		if (!empty($mailblockRecipients)) {
-			$recipients = preg_split("/\r\n|\n|\r/", $mailblockRecipients);
+		if (!$this->validateEmailAddresses($mailblockRecipients)) {
+			$validationResult->error(_t('Mailblock.RecipientError',
+				'There are invalid email addresses in the Recipient(s) field.'
+			));
+		}
+
+		$whitelist = $this->owner->getField('MailblockWhitelist');
+		if (!$this->validateEmailAddresses($whitelist)) {
+			$validationResult->error(_t('Mailblock.WhitelistError',
+				'There are invalid email addresses in the Whitelist field.'
+			));
+		}
+	}
+
+	protected function validateEmailAddresses($emails) {
+		if (!empty($emails)) {
+			$recipients = preg_split("/\r\n|\n|\r/", $emails);
 			foreach ($recipients as $recipient) {
 				if (!Email::validEmailAddress($recipient)) {
-					$validationResult->error(_t('Mailblock.RecipientError',
-						'All Mailblock recipients are not valid email addresses.'
-					));
+					return FALSE;
 				}
 			}
 		}
+		return TRUE;
 	}
 
 	public function updateCMSFields(FieldList $fields) {
@@ -79,6 +94,19 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			$recipients->setDescription(_t('Mailblock.RecipientsDescription',
 					'Redirect messages sent via the MailblockMailer to these '
 					. 'addresses (one per line).'
+			));
+
+			$fields->addFieldToTab(
+					'Root.Mailblock',
+					$whitelist = TextareaField::create(
+							'MailblockWhitelist',
+							_t('Mailblock.Whitelist',
+									'Whitelist'
+							)
+					)
+			);
+			$whitelist->setDescription(_t('Mailblock.WhitelistDescription',
+					'Permit delivery to these email addresses (one per line). '
 			));
 
 			$fields->addFieldsToTab(

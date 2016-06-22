@@ -88,13 +88,23 @@ class MailblockMailer extends Mailer {
 				// @TODO BCC/CC
 				$subject .= ']';
 			}
-			$recipients = implode(', ', preg_split("/\r\n|\n|\r/",
+
+			$newRecipients = implode(', ', preg_split("/\r\n|\n|\r/",
 				$mailblockRecipients
 			));
+			// If one of the orignial recipients is in the whitelist, add them
+			// to the new recipients list.
+			$mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
+			$whitelist = preg_split("/\r\n|\n|\r/", $mailblockWhitelist);
+			foreach ($whitelist as $whiteListed) {
+				if (strpos($recipients, $whiteListed) !== false) {
+					$newRecipients .= ', ' . $whiteListed;
+				}
+			}
 		}
 
 		$rewrites = array(
-			'to'      => $recipients,
+			'to'      => $newRecipients,
 			'subject' => $subject,
 		);
 		return $rewrites;
