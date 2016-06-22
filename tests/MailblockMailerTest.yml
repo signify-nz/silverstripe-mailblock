@@ -1,0 +1,4 @@
+SiteConfig:
+  default:
+    MailblockEnabled: 1
+    MailblockRecipients: blocked@example.com

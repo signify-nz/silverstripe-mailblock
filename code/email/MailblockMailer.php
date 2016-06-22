@@ -57,7 +57,7 @@ class MailblockMailer extends Mailer {
 	 * @param string $subject Original email subject.
 	 * @return array Rewritten subject and recipients.
 	 */
-	private function mailblockRewrite($recipients, $subject) {
+	protected function mailblockRewrite($recipients, $subject) {
 		if (class_exists('Subsite')) {
 			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
 		}
