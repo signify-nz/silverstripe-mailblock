@@ -172,6 +172,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 				$overrideConfiguration,
 				$recipients,
 				$advancedSettings,
+				$whitelist,
 			);
 			foreach ($hiddenFields as $field) {
 				$field->displayIf('MailblockEnabled')->isChecked();
