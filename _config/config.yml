@@ -11,3 +11,6 @@ SiteConfig:
 Injector:
   Mailer:
     class: MailblockMailer
+SiteConfigLeftAndMain:
+  extensions:
+    - MailblockSiteConfigLeftAndMain
