@@ -43,6 +43,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		$subsites = class_exists('Subsite');
 		$onMainSite = TRUE;
 		$currentSubsiteID = 0;
+		$currentSiteConfig = SiteConfig::current_site_config();
 		if ($subsites) {
 			$currentSubsiteID = Subsite::currentSubsiteID();
 			if ($currentSubsiteID) {
@@ -51,20 +52,20 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
 		}
 		else {
-			$mainSiteConfig = SiteConfig::current_site_config();
+			$mainSiteConfig = $currentSiteConfig;
 		}
 
 		// Add mailblock CMS fields.
 		if(Permission::check('MANAGE_MAILBLOCK')
 		   && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
 		) {
-
+			$enabled = $currentSiteConfig->getField('MailblockEnabled');
 			$tabSet = new TabSet(
 				'Mailblock',
 				$settingsTab = $this->basicSettingsFields(),
 				$advancedSettingsTab = $this
 					->advancedSettingsFields($onMainSite, $currentSubsiteID),
-				$testTab = $this->testEmailCMSFields()
+				$testTab = $this->testEmailCMSFields($enabled)
 			);
 			$fields->addFieldToTab('Root', $tabSet);
 
@@ -164,6 +165,12 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		}
 
 		$tab = Tab::create('AdvancedSettings',
+			DisplayLogicWrapper::create(LiteralField::create(
+				'MailblockAdvancedSettings',
+				'<p class="message notice">' . _t('Mailblock.AdvancedSettings',
+					'Enable mailblock to view advanced settings.'
+				) . '</p>'
+			))->hideIf('MailblockEnabled')->isChecked()->end(),
 			CheckboxField::create(
 				'MailblockEnabledOnLive',
 				_t('Mailblock.EnabledOnLive',
@@ -188,8 +195,23 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		return $tab;
 	}
 
-	private function testEmailCMSFields() {
+	private function testEmailCMSFields($enabled) {
+		if (!$enabled) {
+			$mailblockWarning = LiteralField::create(
+				'MailblockWarning',
+				'<p class="message warning">' . _t('Mailblock.Warning',
+					'WARNING: Mailblock is currently inactive. Email will '
+					. 'NOT be redirected.'
+				) . '</p>'
+			);
+		}
+		else {
+			$mailblockWarning = FALSE;
+		}
+
+
 		$tab = Tab::create('TestEmail',
+			$mailblockWarning,
 			TextField::create(
 				'MailblockTestTo',
 				_t('Mailblock.TestTo',
