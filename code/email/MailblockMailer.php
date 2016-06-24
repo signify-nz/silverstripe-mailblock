@@ -81,12 +81,20 @@ class MailblockMailer extends Mailer {
 		if($enabled && ($enabledOnLive || SS_ENVIRONMENT_TYPE != 'live')
 		   && (!$configuration || $overrideConfiguration)
 		) {
+			// Get the CC/BCC recipients from the headers.
+			$ccHeaders = '';
+			$bccHeaders = '';
+			if (isset($customHeaders['Cc'])) $ccHeaders = $customHeaders['Cc'];
+			if (isset($customHeaders['Bcc'])) $bccHeaders = $customHeaders['Bcc'];
+
 			$mailblockRecipients = $siteConfig->getField('MailblockRecipients');
+
 			// Rewrite subject if 'send_all_emails_to' is not set.
 			// If it is set, the subject has already been rewritten.
 			if(!$configuration) {
 				$subject .= " [addressed to $recipients";
-				// @TODO BCC/CC
+				if($ccHeaders) $subject .= ", cc to $ccHeaders";
+				if($bccHeaders) $subject .= ", bcc to $bccHeaders";
 				$subject .= ']';
 			}
 
@@ -97,14 +105,22 @@ class MailblockMailer extends Mailer {
 			// to the new recipients list.
 			$mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
 			$whitelist = preg_split("/\r\n|\n|\r/", $mailblockWhitelist);
+			$cc = '';
+			$bcc = '';
 			foreach ($whitelist as $whiteListed) {
 				if (strpos($recipients, $whiteListed) !== false) {
 					$newRecipients .= ', ' . $whiteListed;
 				}
+				if (strpos($ccHeaders, $whiteListed) !== false) {
+					$cc = $whiteListed . ', ';
+				}
+				if (strpos($bccHeaders, $whiteListed) !== false) {
+					$bcc = $whiteListed . ', ';
+				}
 			}
 			$recipients = $newRecipients;
-			unset($customHeaders['Cc']);
-			unset($customHeaders['Bcc']);
+			$customHeaders['Cc'] = $cc;
+			$customHeaders['Bcc'] = $bcc;
 		}
 
 		$rewrites = array(
