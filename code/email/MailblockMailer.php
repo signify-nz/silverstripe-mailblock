@@ -108,14 +108,16 @@ class MailblockMailer extends Mailer {
 			$cc = '';
 			$bcc = '';
 			foreach ($whitelist as $whiteListed) {
-				if (strpos($recipients, $whiteListed) !== false) {
-					$newRecipients .= ', ' . $whiteListed;
-				}
-				if (strpos($ccHeaders, $whiteListed) !== false) {
-					$cc = $whiteListed . ', ';
-				}
-				if (strpos($bccHeaders, $whiteListed) !== false) {
-					$bcc = $whiteListed . ', ';
+				if (!empty($whiteListed)) {
+					if (strpos($recipients, $whiteListed) !== false) {
+						$newRecipients .= ', ' . $whiteListed;
+					}
+					if (strpos($ccHeaders, $whiteListed) !== false) {
+						$cc = $whiteListed . ', ';
+					}
+					if (strpos($bccHeaders, $whiteListed) !== false) {
+						$bcc = $whiteListed . ', ';
+					}
 				}
 			}
 			$recipients = $newRecipients;
