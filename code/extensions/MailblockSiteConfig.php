@@ -179,6 +179,9 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 			)->setDescription(_t('Mailblock.EnabledOnLiveDescription',
 					'Whether messages sent via the MailblockMailer should be '
 					. 'redirected to the below recipient(s). Useful for prelive sites.'
+					. ' Site is currently <strong>'
+					. Config::inst()->get('Director', 'environment_type')
+					. '</strong> mode.'
 			)),
 			$overrideConfiguration = CheckboxField::create(
 					'MailblockOverrideConfiguration',
@@ -187,7 +190,9 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 					)
 			)->setDescription(_t('Mailblock.OverrideConfigurationDescription',
 					'Whether mailblock should override the hard coded Email class '
-					. '\'send_all_emails_to\' configuration setting.'
+					. '\'send_all_emails_to\' configuration setting. Please note '
+					. 'that if \'send_all_emails_to\' is set, then the whitelist '
+					. 'will not be respected.'
 			)),
 			$applyPerSubsite
 		);
