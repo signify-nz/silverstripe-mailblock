@@ -44,7 +44,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 		$onMainSite = TRUE;
 		$currentSubsiteID = 0;
 		$currentSiteConfig = SiteConfig::current_site_config();
-		if ($subsites) {
+		if($subsites) {
 			$currentSubsiteID = Subsite::currentSubsiteID();
 			if ($currentSubsiteID) {
 				$onMainSite = FALSE;
@@ -86,8 +86,27 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider {
 	}
 
 	public function updateCMSActions(FieldList $actions) {
-		$testAction = FormAction::create('mailblockTestEmail', 'Send Test Email');
-		$actions->push($testAction);
+		$subsites = class_exists('Subsite');
+		$onMainSite = TRUE;
+		$currentSubsiteID = 0;
+		$currentSiteConfig = SiteConfig::current_site_config();
+		if($subsites) {
+			$currentSubsiteID = Subsite::currentSubsiteID();
+			if ($currentSubsiteID) {
+				$onMainSite = FALSE;
+			}
+			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
+		}
+		else {
+			$mainSiteConfig = $currentSiteConfig;
+		}
+
+		if(Permission::check('MANAGE_MAILBLOCK')
+		   && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
+		) {
+			$testAction = FormAction::create('mailblockTestEmail', 'Send Test Email');
+			$actions->push($testAction);
+		}
 	}
 
 	/**
