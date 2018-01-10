@@ -16,6 +16,6 @@ If you prefer you may also install manually:
 All options are in the Settings -> Mailblock section of the CMS. Only users with the "Access to 'Mailblock' settings" permission will be able to configure Mailblock.
 
 ## Limitations
-This module works by setting the Mailer class to the MailblockMailer. If you are using a custom mailer, it will need to extend the MailblockMailer class for this module to work.
+This module works by adding an additional SwiftMailer (the Mailer included with SilverStripe) plugin. If you are using a custom mailer, no email recipient rewritting will take place.
 
 [User Guide](/docs/en/user_guide.md)

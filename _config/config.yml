@@ -1,16 +1,14 @@
 ---
 Name: mailblockconfig
 After:
-  - 'framework/*'
-  - 'cms/*'
+  - '#emailconfig'
 ---
-
-SiteConfig:
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - MailblockSiteConfig
-Injector:
-  Mailer:
-    class: MailblockMailer
-SiteConfigLeftAndMain:
+SilverStripe\SiteConfig\SiteConfigLeftAndMain:
   extensions:
     - MailblockSiteConfigLeftAndMain
+SilverStripe\Control\Email\SwiftMailer:
+  swift_plugins: 
+    - Mailblock\Email\MailblockPlugin
