@@ -14,5 +14,10 @@
     "require": {
         "silverstripe/cms": "^4",
         "silverstripe/framework": "^4"
-    }
+    },
+    "extra": {
+        "expose": [
+            "javascript"
+        ]
+    },
 }
