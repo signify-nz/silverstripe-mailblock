@@ -20,7 +20,7 @@ class MailblockSiteConfigLeftAndMain extends LeftAndMainExtension
     }
 
     public function init() {
-        Requirements::javascript("silverstripe-mailblock/javascript/mailblock.js");
+        Requirements::javascript("signify-nz/silverstripe-mailblock: javascript/mailblock.js");
     }
 
     public function mailblockTestEmail($data, $form){
