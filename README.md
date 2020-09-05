@@ -1,6 +1,11 @@
 # Mailblock
 Adds email redirection options to the CMS.
 
+## Requirements
+* [SilverStripe CMS ^4](https://github.com/silverstripe/silverstripe-cms)
+
+SilverStripe 3 support is available in the [1.0 branch](https://github.com/signify-nz/silverstripe-mailblock/tree/1.0)
+
 ## Installation
 __Composer (recommended):__
 ```
