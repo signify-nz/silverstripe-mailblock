@@ -1,6 +1,10 @@
 # Mailblock
 Adds email redirection options to the CMS.
 
+## Requirements
+
+* [SilverStripe CMS ^3.2](https://github.com/silverstripe/silverstripe-cms/tree/3)
+
 ## Installation
 __Composer (recommended):__
 ```
