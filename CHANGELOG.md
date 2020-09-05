@@ -1,5 +1,9 @@
 # Changelog
 
+2.0.1 (2020-09-05)
+- Add missing releases to changelog.
+- Add SilverStripe requirements to readme.
+
 2.0.0 (2020-08-16)
 - Add Silverstripe 4 support.
 
