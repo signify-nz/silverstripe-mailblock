@@ -60,7 +60,16 @@ class MailblockMailer extends Mailer {
 	protected function mailblockRewrite($recipients, $subject, $customHeaders) {
 		// Get the correct mailblock config.
 		if (class_exists('Subsite')) {
+			// Disable the locale filter if Translatable uses the wrong locale.
+			$badTranslatable = $this->hasBadTranslatable();
+			if ($badTranslatable) {
+				$enabled = Translatable::disable_locale_filter();
+			}
 			$mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
+			// Re-enable the locale filter if it was disabled.
+			if ($badTranslatable) {
+				Translatable::enable_locale_filter($enabled);
+			}
 		}
 		else {
 			$mainSiteConfig = SiteConfig::current_site_config();
@@ -101,7 +110,7 @@ class MailblockMailer extends Mailer {
 			$newRecipients = implode(', ', preg_split("/\r\n|\n|\r/",
 				$mailblockRecipients
 			));
-			// If one of the orignial recipients is in the whitelist, add them
+				// If one of the original recipients is in the whitelist, add them
 			// to the new recipients list.
 			$mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
 			$whitelist = preg_split("/\r\n|\n|\r/", $mailblockWhitelist);
@@ -131,5 +140,18 @@ class MailblockMailer extends Mailer {
 			'headers' => $customHeaders,
 		);
 		return $rewrites;
+	}
+
+	/**
+	 * Is Translatable installed, and does it misbehave in the current scenario.
+	 *
+	 * When creating a member the locale is temporarily changed which
+	 * interferes with subsite retrieval.
+	 *
+	 * @return boolean
+	 */
+	private function hasBadTranslatable() {
+		return class_exists('Translatable')
+		&& Director::get_current_page() instanceof SecurityAdmin;
 	}
 }
