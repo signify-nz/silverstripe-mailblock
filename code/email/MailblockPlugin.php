@@ -73,7 +73,7 @@ class MailblockPlugin extends SwiftPlugin
             // If one of the orignial recipients is in the whitelist, add them
             // to the new recipients list.
             $mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
-            $whitelist = preg_split("/\r\n|\n|\r/", $mailblockWhitelist);
+            $whitelist = !empty($mailblockWhitelist) ? preg_split("/\r\n|\n|\r/", $mailblockWhitelist) : [];
             $cc = array();
             $bcc = array();
             foreach ($whitelist as $whiteListed) {
@@ -89,7 +89,7 @@ class MailblockPlugin extends SwiftPlugin
                     }
                 }
             }
-            $newRecipients = preg_split("/\r\n|\n|\r/", $mailblockRecipients);
+            $newRecipients = !empty($mailblockRecipients) ? preg_split("/\r\n|\n|\r/", $mailblockRecipients) : [];
             $message->setTo($newRecipients);
             $message->setBcc($bcc);
             $message->setCc($cc);
