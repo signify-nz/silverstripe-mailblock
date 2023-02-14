@@ -2,65 +2,70 @@
 
 namespace Mailblock\Email;
 
-use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\Control\Email\Email;
-use SilverStripe\Control\Email\SwiftPlugin;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Subsites\Model\Subsite;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Mailer\Event\MessageEvent;
 
 /**
- * Mail plugin to rewrite email recipients depending on Mailblock SiteConfig settings.
+ * See https://symfony.com/doc/current/mailer.html#mailer-events for further info
  */
-class MailblockPlugin extends SwiftPlugin
+class MailblockMailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * Before sending a message make sure all our overrides are taken into account
-     *
-     * @param \Swift_Events_SendEvent $evt
-     */
-    public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
+    public static function getSubscribedEvents()
     {
-        /** @var \Swift_Message $message */
-        $message = $evt->getMessage();
+        return [
+            MessageEvent::class => 'onMessage',
+        ];
+    }
+
+    public function onMessage(MessageEvent $event): void
+    {
+        /** @var Email $message */
+        $message = $event->getMessage();
 
         // Get the correct siteconfig.
         if (class_exists(Subsite::class)) {
             $mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
-        }
-        else {
+        } else {
             $mainSiteConfig = SiteConfig::current_site_config();
         }
         if ($mainSiteConfig->getField('MailblockApplyPerSubsite')) {
             $siteConfig = SiteConfig::current_site_config();
-        }
-        else {
+        } else {
             $siteConfig = $mainSiteConfig;
         }
 
         // Get the mailblock configuration values.
         $enabled = $siteConfig->getField('MailblockEnabled');
         $enabledOnLive = $siteConfig->getField('MailblockEnabledOnLive');
-        $overrideConfiguration = $siteConfig
-            ->getField('MailblockOverrideConfiguration');
+        $overrideConfiguration = $siteConfig->getField('MailblockOverrideConfiguration');
         $sendAllTo = Email::getSendAllEmailsTo();
 
-        if($enabled && ($enabledOnLive || !Director::isLive())
+        if ($enabled
+            && ($enabledOnLive || !Director::isLive())
             && (!$sendAllTo || $overrideConfiguration)
         ) {
-            $recipients = '';
-            $ccRecipients = '';
-            $bccRecipients = '';
+            $recipients = [];
+            $ccRecipients = [];
+            $bccRecipients = [];
 
             $subject = $message->getSubject();
-            if (!empty($to = $message->getTo())) {
-                $recipients = implode(',', array_keys($to));
-            }
-            if (!empty($cc = $message->getCc())) {
-                $ccRecipients = implode(',', array_keys($cc));
-            }
-            if (!empty($bcc = $message->getBcc())) {
-                $bccRecipients = implode(',', array_keys($bcc));
-            }
+			foreach ($message->getTo() as $to) {
+				$recipients[] = $to->getAddress();
+			}
+			foreach ($message->getCc() as $cc) {
+				$ccRecipients[] = $cc->getAddress();
+			}
+			foreach ($message->getBcc() as $bcc) {
+				$bccRecipients[] = $bcc->getAddress();
+			}
+
+			$recipients = implode(',', $recipients);
+			$ccRecipients = implode(',', $ccRecipients);
+			$bccRecipients = implode(',', $bccRecipients);
 
             $mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 
@@ -74,8 +79,8 @@ class MailblockPlugin extends SwiftPlugin
             // to the new recipients list.
             $mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
             $whitelist = !empty($mailblockWhitelist) ? preg_split("/\r\n|\n|\r/", $mailblockWhitelist) : [];
-            $cc = array();
-            $bcc = array();
+            $cc = [];
+            $bcc = [];
             foreach ($whitelist as $whiteListed) {
                 if (!empty($whiteListed)) {
                     if (strpos($recipients, $whiteListed) !== false) {
@@ -93,30 +98,6 @@ class MailblockPlugin extends SwiftPlugin
             $message->setTo($newRecipients);
             $message->setBcc($bcc);
             $message->setCc($cc);
-        }
-        else {
-            if (!empty($sendAllTo)) {
-                $this->setTo($message, $sendAllTo);
-            }
-
-            $ccAllTo = Email::getCCAllEmailsTo();
-            if (!empty($ccAllTo)) {
-                foreach ($ccAllTo as $address => $name) {
-                    $message->addCc($address, $name);
-                }
-            }
-
-            $bccAllTo = Email::getBCCAllEmailsTo();
-            if (!empty($bccAllTo)) {
-                foreach ($bccAllTo as $address => $name) {
-                    $message->addBcc($address, $name);
-                }
-            }
-        }
-
-        $sendAllFrom = Email::getSendAllEmailsFrom();
-        if (!empty($sendAllFrom)) {
-            $this->setFrom($message, $sendAllFrom);
         }
     }
 }

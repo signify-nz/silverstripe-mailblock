@@ -31,12 +31,12 @@ class MailblockSiteConfigLeftAndMain extends LeftAndMainExtension
             $siteConfig = SiteConfig::current_site_config();
         }
 
-        $to = $siteConfig->getField('MailblockTestTo');
-        $from = $siteConfig->getField('MailblockTestFrom');
-        $subject = $siteConfig->getField('MailblockTestSubject');
-        $body = $siteConfig->getField('MailblockTestBody');
-        $cc = $siteConfig->getField('MailblockTestCc');
-        $bcc = $siteConfig->getField('MailblockTestBcc');
+        $to = $siteConfig->getField('MailblockTestTo') ?? '';
+        $from = $siteConfig->getField('MailblockTestFrom') ?? '';
+        $subject = $siteConfig->getField('MailblockTestSubject') ?? '';
+        $body = $siteConfig->getField('MailblockTestBody') ?? '';
+        $cc = $siteConfig->getField('MailblockTestCc') ?? '';
+        $bcc = $siteConfig->getField('MailblockTestBcc') ?? '';
         $email = new Email($from, $to, $subject, $body, $cc, $bcc);
         $email->send();
 
