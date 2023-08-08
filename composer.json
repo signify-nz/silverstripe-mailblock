@@ -12,8 +12,8 @@
         "issues": "http://github.com/signify-nz/silverstripe-mailblock/issues"
     },
     "require": {
-        "silverstripe/framework": "^4",
-        "silverstripe/siteconfig": "^4"
+        "silverstripe/framework": "^5",
+        "silverstripe/siteconfig": "^5"
     },
     "extra": {
         "expose": [

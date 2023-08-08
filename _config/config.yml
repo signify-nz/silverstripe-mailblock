@@ -1,14 +1,17 @@
 ---
 Name: mailblockconfig
 After:
-  - '#emailconfig'
+  - '#mailer'
 ---
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Mailblock\extensions\MailblockSiteConfig
+
 SilverStripe\SiteConfig\SiteConfigLeftAndMain:
   extensions:
     - Mailblock\extensions\MailblockSiteConfigLeftAndMain
-SilverStripe\Control\Email\SwiftMailer:
-  swift_plugins: 
-    - Mailblock\Email\MailblockPlugin
+
+SilverStripe\Core\Injector\Injector:
+  Symfony\Component\EventDispatcher\EventDispatcherInterface.mailer:
+    calls:
+      - [addSubscriber, ['%$Mailblock\Email\MailblockMailSubscriber']]
