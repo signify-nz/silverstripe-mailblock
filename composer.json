@@ -19,5 +19,14 @@
         "expose": [
             "javascript"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
     }
 }
