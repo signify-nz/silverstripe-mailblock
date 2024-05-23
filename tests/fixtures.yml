@@ -1,0 +1,5 @@
+SilverStripe\SiteConfig\SiteConfig:
+  mysiteconfig:
+    MailblockEnabled: false
+    MailblockRecipients: ''
+    MailblockWhitelist: ''
