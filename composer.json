@@ -12,6 +12,7 @@
         "issues": "http://github.com/signify-nz/silverstripe-mailblock/issues"
     },
     "require": {
+        "php": ">=8.1",
         "silverstripe/framework": "^5",
         "silverstripe/siteconfig": "^5"
     },
