@@ -44,7 +44,8 @@ class MailblockMailSubscriber implements EventSubscriberInterface
         $overrideConfiguration = $siteConfig->getField('MailblockOverrideConfiguration');
         $sendAllTo = Email::getSendAllEmailsTo();
 
-        if ($enabled
+        if (
+            $enabled
             && ($enabledOnLive || !Director::isLive())
             && (!$sendAllTo || $overrideConfiguration)
         ) {
@@ -53,19 +54,19 @@ class MailblockMailSubscriber implements EventSubscriberInterface
             $bccRecipients = [];
 
             $subject = $message->getSubject();
-			foreach ($message->getTo() as $to) {
-				$recipients[] = $to->getAddress();
-			}
-			foreach ($message->getCc() as $cc) {
-				$ccRecipients[] = $cc->getAddress();
-			}
-			foreach ($message->getBcc() as $bcc) {
-				$bccRecipients[] = $bcc->getAddress();
-			}
+            foreach ($message->getTo() as $to) {
+                $recipients[] = $to->getAddress();
+            }
+            foreach ($message->getCc() as $cc) {
+                $ccRecipients[] = $cc->getAddress();
+            }
+            foreach ($message->getBcc() as $bcc) {
+                $bccRecipients[] = $bcc->getAddress();
+            }
 
-			$recipients = implode(',', $recipients);
-			$ccRecipients = implode(',', $ccRecipients);
-			$bccRecipients = implode(',', $bccRecipients);
+            $recipients = implode(',', $recipients);
+            $ccRecipients = implode(',', $ccRecipients);
+            $bccRecipients = implode(',', $bccRecipients);
 
             $mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 
@@ -79,6 +80,7 @@ class MailblockMailSubscriber implements EventSubscriberInterface
             // to the new recipients list.
             $mailblockWhitelist = $siteConfig->getField('MailblockWhitelist');
             $whitelist = !empty($mailblockWhitelist) ? preg_split("/\r\n|\n|\r/", $mailblockWhitelist) : [];
+            $newRecipients = !empty($mailblockRecipients) ? preg_split("/\r\n|\n|\r/", $mailblockRecipients) : [];
             $cc = [];
             $bcc = [];
             foreach ($whitelist as $whiteListed) {
@@ -94,7 +96,6 @@ class MailblockMailSubscriber implements EventSubscriberInterface
                     }
                 }
             }
-            $newRecipients = !empty($mailblockRecipients) ? preg_split("/\r\n|\n|\r/", $mailblockRecipients) : [];
             $message->setTo($newRecipients);
             $message->setBcc($bcc);
             $message->setCc($cc);
