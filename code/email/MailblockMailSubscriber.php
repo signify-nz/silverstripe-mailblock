@@ -71,8 +71,12 @@ class MailblockMailSubscriber implements EventSubscriberInterface
             $mailblockRecipients = $siteConfig->getField('MailblockRecipients');
 
             $subject .= " [addressed to $recipients";
-            if ($ccRecipients) $subject .= ", cc to $ccRecipients";
-            if ($bccRecipients) $subject .= ", bcc to $bccRecipients";
+            if ($ccRecipients) {
+                $subject .= ", cc to $ccRecipients";
+            }
+            if ($bccRecipients) {
+                $subject .= ", bcc to $bccRecipients";
+            }
             $subject .= ']';
             $message->setSubject($subject);
 
