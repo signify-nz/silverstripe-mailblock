@@ -41,47 +41,50 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
         'MailblockTestBcc'                => 'Text',
     );
 
-    public function validate(ValidationResult $validationResult) {
+    public function validate(ValidationResult $validationResult)
+    {
         $mailblockRecipients = $this->owner->getField('MailblockRecipients');
         if (!$this->validateEmailAddresses($mailblockRecipients)) {
-            $validationResult->addError(_t('Mailblock.RecipientError',
+            $validationResult->addError(_t(
+                'Mailblock.RecipientError',
                 'There are invalid email addresses in the Recipient(s) field.'
             ));
         }
 
         $whitelist = $this->owner->getField('MailblockWhitelist');
         if (!$this->validateEmailAddresses($whitelist)) {
-            $validationResult->addError(_t('Mailblock.WhitelistError',
+            $validationResult->addError(_t(
+                'Mailblock.WhitelistError',
                 'There are invalid email addresses in the Whitelist field.'
             ));
         }
     }
 
-    public function updateCMSFields(FieldList $fields) {
+    public function updateCMSFields(FieldList $fields)
+    {
         $subsites = class_exists(Subsite::class);
-        $onMainSite = TRUE;
+        $onMainSite = true;
         $currentSubsiteID = 0;
         $currentSiteConfig = SiteConfig::current_site_config();
-        if($subsites) {
+        if ($subsites) {
             $currentSubsiteID = SubsiteState::singleton()->getSubsiteId();
             if ($currentSubsiteID) {
-                $onMainSite = FALSE;
+                $onMainSite = false;
             }
             $mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
-        }
-        else {
+        } else {
             $mainSiteConfig = $currentSiteConfig;
         }
 
         // Add mailblock CMS fields.
-        if(Permission::check('MANAGE_MAILBLOCK')
-           && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
+        if (
+            Permission::check('MANAGE_MAILBLOCK')
+            && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
             $enabled = $currentSiteConfig->getField('MailblockEnabled');
             $tabSet = new TabSet(
                 'Mailblock',
                 'Mailblock'
-
             );
             $tabSet->setTabs(new FieldList(
                 $settingsTab = $this->basicSettingsFields(),
@@ -97,7 +100,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
                 'MailblockRecipients',
                 'MailblockWhitelist',
             );
-            if($subsites && $currentSubsiteID == 0) {
+            if ($subsites && $currentSubsiteID == 0) {
                 $hiddenFields[] = 'MailblockApplyPerSubsite';
             }
             foreach ($hiddenFields as $field) {
@@ -106,24 +109,25 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
         }
     }
 
-    public function updateCMSActions(FieldList $actions) {
+    public function updateCMSActions(FieldList $actions)
+    {
         $subsites = class_exists(Subsite::class);
-        $onMainSite = TRUE;
+        $onMainSite = true;
         $currentSubsiteID = 0;
         $currentSiteConfig = SiteConfig::current_site_config();
-        if($subsites) {
+        if ($subsites) {
             $currentSubsiteID = SubsiteState::singleton()->getSubsiteId();
             if ($currentSubsiteID) {
-                $onMainSite = FALSE;
+                $onMainSite = false;
             }
             $mainSiteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
-        }
-        else {
+        } else {
             $mainSiteConfig = $currentSiteConfig;
         }
 
-        if(Permission::check('MANAGE_MAILBLOCK')
-           && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
+        if (
+            Permission::check('MANAGE_MAILBLOCK')
+            && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
             $testAction = FormAction::create('mailblockTestEmail', 'Send Test Email');
             $actions->push($testAction);
@@ -135,13 +139,16 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
      *
      * @return array
      */
-    public function providePermissions() {
+    public function providePermissions()
+    {
         return array(
             'MANAGE_MAILBLOCK' => array(
-                'name'     => _t('Mailblock.ADMIN_PERMISSION',
+                'name'     => _t(
+                    'Mailblock.ADMIN_PERMISSION',
                     'Access to \'Mailblock\' settings'
                 ),
-                'category' => _t('Permission.CMS_ACCESS_CATEGORY',
+                'category' => _t(
+                    'Permission.CMS_ACCESS_CATEGORY',
                     'CMS Access'
                 ),
                 'sort'     => 100,
@@ -149,71 +156,83 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
         );
     }
 
-    protected function validateEmailAddresses($emails) {
+    protected function validateEmailAddresses($emails)
+    {
         if (!empty($emails)) {
             $recipients = preg_split("/\r\n|\n|\r/", $emails);
             foreach ($recipients as $recipient) {
                 if (!Email::is_valid_address($recipient)) {
-                    return FALSE;
+                    return false;
                 }
             }
         }
-        return TRUE;
+        return true;
     }
 
-    private function basicSettingsFields() {
-        $tab = Tab::create('BasicSettings',
+    private function basicSettingsFields()
+    {
+        $tab = Tab::create(
+            'BasicSettings',
             CheckboxField::create(
                 'MailblockEnabled',
-                _t('Mailblock.Enabled','Enable mailblock.')
+                _t('Mailblock.Enabled', 'Enable mailblock.')
             ),
             TextareaField::create(
                 'MailblockRecipients',
-                _t('Mailblock.Recipients',
+                _t(
+                    'Mailblock.Recipients',
                     'Recipient(s) for out-going mail'
                 )
-            )->setDescription(_t('Mailblock.RecipientsDescription',
+            )->setDescription(_t(
+                'Mailblock.RecipientsDescription',
                 'Redirect messages sent via the MailblockMailer to these '
-              . 'addresses (one per line).'
+                    . 'addresses (one per line).'
             )),
             TextareaField::create(
                 'MailblockWhitelist',
-                _t('Mailblock.Whitelist',
-                        'Whitelist'
+                _t(
+                    'Mailblock.Whitelist',
+                    'Whitelist'
                 )
-            )->setDescription(_t('Mailblock.WhitelistDescription',
+            )->setDescription(_t(
+                'Mailblock.WhitelistDescription',
                 'Permit delivery to these email addresses (one per line). '
             ))
         );
         return $tab;
     }
 
-    private function advancedSettingsFields($subsites, $currentSubsiteID) {
+    private function advancedSettingsFields($subsites, $currentSubsiteID)
+    {
         $applyPerSubsite = '';
 
         $enabledOnLive = CheckboxField::create(
             'MailblockEnabledOnLive',
-            _t('Mailblock.EnabledOnLive',
+            _t(
+                'Mailblock.EnabledOnLive',
                 'Enable mailblock on live site.'
             )
-        )->setDescription(_t('Mailblock.EnabledOnLiveDescription',
+        )->setDescription(_t(
+            'Mailblock.EnabledOnLiveDescription',
             'Whether messages sent via the MailblockMailer should be '
-            . 'redirected to the below recipient(s). Useful for prelive sites.'
-            . ' Site is currently <strong>'
-            . Config::inst()->get(Director::class, 'environment_type')
-            . '</strong> mode.'
+                . 'redirected to the below recipient(s). Useful for prelive sites.'
+                . ' Site is currently <strong>'
+                . Config::inst()->get(Director::class, 'environment_type')
+                . '</strong> mode.'
         ));
 
         $overrideConfiguration = CheckboxField::create(
             'MailblockOverrideConfiguration',
-            _t('Mailblock.OverrideConfiguration',
+            _t(
+                'Mailblock.OverrideConfiguration',
                 'Override configuration settings.'
             )
-        )->setDescription(_t('Mailblock.OverrideConfigurationDescription',
+        )->setDescription(_t(
+            'Mailblock.OverrideConfigurationDescription',
             'Whether mailblock should override the hard coded Email class '
-            . '\'send_all_emails_to\' configuration setting. Please note '
-            . 'that if \'send_all_emails_to\' is set, then the whitelist '
-            . 'will not be respected.'
+                . '\'send_all_emails_to\' configuration setting. Please note '
+                . 'that if \'send_all_emails_to\' is set, then the whitelist '
+                . 'will not be respected.'
         ));
 
         $tab = Tab::create(
@@ -222,16 +241,18 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
             $overrideConfiguration
         );
 
-        if($subsites && $currentSubsiteID == 0) {
+        if ($subsites && $currentSubsiteID == 0) {
             $applyPerSubsite = CheckboxField::create(
                 'MailblockApplyPerSubsite',
-                _t('Mailblock.ApplyPerSubsite',
+                _t(
+                    'Mailblock.ApplyPerSubsite',
                     'Apply mailblock settings per subsite.'
                 )
             )->setDescription(
-                _t('Mailblock.ApplyPerSubsiteDescription',
+                _t(
+                    'Mailblock.ApplyPerSubsiteDescription',
                     'If ticked then different mailblock settings appply '
-                    . 'per subsite rather than globally.'
+                        . 'per subsite rather than globally.'
                 )
             );
             $tab->push($applyPerSubsite);
@@ -240,56 +261,64 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
         return $tab;
     }
 
-    private function testEmailCMSFields($enabled) {
+    private function testEmailCMSFields($enabled)
+    {
         if (!$enabled) {
             $mailblockWarning = LiteralField::create(
                 'MailblockWarning',
-                '<p class="message warning">' . _t('Mailblock.Warning',
+                '<p class="message warning">' . _t(
+                    'Mailblock.Warning',
                     'WARNING: Mailblock is currently inactive. Email will '
-                    . 'NOT be redirected.'
+                        . 'NOT be redirected.'
                 ) . '</p>'
             );
-        }
-        else {
+        } else {
             $mailblockWarning = LiteralField::create('MailblockWarning', '');
         }
 
 
-        $tab = Tab::create('TestEmail',
+        $tab = Tab::create(
+            'TestEmail',
             $mailblockWarning,
             TextField::create(
                 'MailblockTestTo',
-                _t('Mailblock.TestTo',
+                _t(
+                    'Mailblock.TestTo',
                     'To'
                 )
             ),
             TextField::create(
                 'MailblockTestFrom',
-                _t('Mailblock.TestFrom',
+                _t(
+                    'Mailblock.TestFrom',
                     'From'
                 )
             ),
             TextField::create(
                 'MailblockTestCc',
-                _t('Mailblock.TestCc',
+                _t(
+                    'Mailblock.TestCc',
                     'Cc'
                 )
             ),
             TextField::create(
                 'MailblockTestBcc',
-                _t('Mailblock.TestBcc',
+                _t(
+                    'Mailblock.TestBcc',
                     'Bcc'
                 )
             ),
             TextField::create(
                 'MailblockTestSubject',
-                _t('Mailblock.TestSubject',
+                _t(
+                    'Mailblock.TestSubject',
                     'Subject'
                 )
             ),
             TextareaField::create(
                 'MailblockTestBody',
-                _t('Mailblock.TestBody',
+                _t(
+                    'Mailblock.TestBody',
                     'Body'
                 )
             )
