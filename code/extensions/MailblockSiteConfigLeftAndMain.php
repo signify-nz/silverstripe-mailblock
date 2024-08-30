@@ -13,21 +13,23 @@ use SilverStripe\Subsites\Model\Subsite;
  */
 class MailblockSiteConfigLeftAndMain extends LeftAndMainExtension
 {
-    public function subsiteCMSShowInMenu(){
+    public function subsiteCMSShowInMenu()
+    {
         if ($subsites = class_exists(Subsite::class)) {
             return true;
         }
     }
 
-    public function init() {
+    public function init()
+    {
         Requirements::javascript("signify-nz/silverstripe-mailblock:javascript/mailblock.js");
     }
 
-    public function mailblockTestEmail($data, $form){
+    public function mailblockTestEmail($data, $form)
+    {
         if (class_exists(Subsite::class)) {
             $siteConfig = SiteConfig::get()->filter('SubsiteID', 0)->first();
-        }
-        else {
+        } else {
             $siteConfig = SiteConfig::current_site_config();
         }
 
