@@ -6,8 +6,10 @@ Adds email redirection options to the CMS.
 
 * [SilverStripe admin ^5](https://github.com/silverstripe/silverstripe-admin)
 
-SilverStripe 4 support is available in the [2.0 branch](https://github.com/signify-nz/silverstripe-mailblock/tree/2.0)
-SilverStripe 3 support is available in the [1.0 branch](https://github.com/signify-nz/silverstripe-mailblock/tree/1.0)
+Silverstripe 6 support is available in the [4.x branch](https://github.com/signify-nz/silverstripe-mailblock/tree/4.x)
+Silverstripe 5 support is available in the [3.x branch](https://github.com/signify-nz/silverstripe-mailblock/tree/3.x)
+Silverstripe 4 support is available in the [2.0 branch](https://github.com/signify-nz/silverstripe-mailblock/tree/2.0)
+Silverstripe 3 support is available in the [1.0 branch](https://github.com/signify-nz/silverstripe-mailblock/tree/1.0)
 
 ## Installation
 
