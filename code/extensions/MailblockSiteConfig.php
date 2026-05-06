@@ -13,7 +13,6 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\LiteralField;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
@@ -217,7 +216,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
             'Whether messages sent via the MailblockMailer should be '
                 . 'redirected to the below recipient(s). Useful for prelive sites.'
                 . ' Site is currently <strong>'
-                . Config::inst()->get(Director::class, 'environment_type')
+                . Director::get_environment_type()
                 . '</strong> mode.'
         ));
 
