@@ -15,7 +15,7 @@ use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Subsites\Model\Subsite;
 use SilverStripe\Subsites\State\SubsiteState;
@@ -23,7 +23,7 @@ use SilverStripe\Subsites\State\SubsiteState;
 /**
  * Adds a mailblock section to the 'Settings' section of the CMS.
  */
-class MailblockSiteConfig extends DataExtension implements PermissionProvider
+class MailblockSiteConfig extends Extension implements PermissionProvider
 {
     private static $db = array(
         'MailblockEnabled'               => 'Boolean',
@@ -76,8 +76,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
         }
 
         // Add mailblock CMS fields.
-        if (
-            Permission::check('MANAGE_MAILBLOCK')
+        if (Permission::check('MANAGE_MAILBLOCK')
             && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
             $enabled = $currentSiteConfig->getField('MailblockEnabled');
@@ -124,8 +123,7 @@ class MailblockSiteConfig extends DataExtension implements PermissionProvider
             $mainSiteConfig = $currentSiteConfig;
         }
 
-        if (
-            Permission::check('MANAGE_MAILBLOCK')
+        if (Permission::check('MANAGE_MAILBLOCK')
             && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
             $testAction = FormAction::create('mailblockTestEmail', 'Send Test Email');
