@@ -5,13 +5,13 @@ namespace Mailblock\Extensions;
 use SilverStripe\View\Requirements;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Control\Email\Email;
-use SilverStripe\Admin\LeftAndMainExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\Subsites\Model\Subsite;
 
 /**
  * Adds a mailblock test email action to the SiteConfig menu.
  */
-class MailblockSiteConfigLeftAndMain extends LeftAndMainExtension
+class MailblockSiteConfigLeftAndMain extends Extension
 {
     public function subsiteCMSShowInMenu()
     {
