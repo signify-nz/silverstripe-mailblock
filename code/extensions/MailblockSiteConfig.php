@@ -2,7 +2,7 @@
 
 namespace Mailblock\Extensions;
 
-use SilverStripe\ORM\ValidationResult;
+use SilverStripe\Core\Validation\ValidationResult;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Security\Permission;
@@ -40,7 +40,7 @@ class MailblockSiteConfig extends Extension implements PermissionProvider
         'MailblockTestBcc'                => 'Text',
     );
 
-    public function validate(ValidationResult $validationResult)
+    public function updateValidate(ValidationResult $validationResult)
     {
         $mailblockRecipients = $this->owner->getField('MailblockRecipients');
         if (!$this->validateEmailAddresses($mailblockRecipients)) {
@@ -76,7 +76,8 @@ class MailblockSiteConfig extends Extension implements PermissionProvider
         }
 
         // Add mailblock CMS fields.
-        if (Permission::check('MANAGE_MAILBLOCK')
+        if (
+            Permission::check('MANAGE_MAILBLOCK')
             && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
             $enabled = $currentSiteConfig->getField('MailblockEnabled');
@@ -101,9 +102,6 @@ class MailblockSiteConfig extends Extension implements PermissionProvider
             if ($subsites && $currentSubsiteID == 0) {
                 $hiddenFields[] = 'MailblockApplyPerSubsite';
             }
-            foreach ($hiddenFields as $field) {
-                $field = $fields->dataFieldByName($field);
-            }
         }
     }
 
@@ -123,11 +121,25 @@ class MailblockSiteConfig extends Extension implements PermissionProvider
             $mainSiteConfig = $currentSiteConfig;
         }
 
-        if (Permission::check('MANAGE_MAILBLOCK')
+        if (
+            Permission::check('MANAGE_MAILBLOCK')
             && ($mainSiteConfig->getField('MailblockApplyPerSubsite') || $onMainSite)
         ) {
-            $testAction = FormAction::create('mailblockTestEmail', 'Send Test Email');
-            $actions->push($testAction);
+            // In SS6, LeftAndMain only adds the default Save button if the actions
+            // list is still empty after this hook runs. Since we're adding an
+            // action, we must restore Save ourselves.
+            if (!$actions->fieldByName('action_save') && $this->owner->canEdit()) {
+                $actions->push(
+                    FormAction::create('save', _t('SilverStripe\\Admin\\LeftAndMain.SAVE', 'Save'))
+                        ->addExtraClass('btn btn-primary')
+                        ->setIcon('add-circle')
+                );
+            }
+
+            $actions->push(
+                FormAction::create('mailblockTestEmail', 'Send Test Email')
+                    ->addExtraClass('btn btn-secondary')
+            );
         }
     }
 
