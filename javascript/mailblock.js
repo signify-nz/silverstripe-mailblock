@@ -1,7 +1,7 @@
 (function($) {
     $(document).ready(function(){
         showHideButton();
-        $(document).on('shown.bs.tab click', '.nav-tabs .nav-link', function() {
+        $(document).on('tabsactivate click', '.cms-tabset-nav-primary a', function() {
             setTimeout(showHideButton, 0);
         });
         $(document).ajaxComplete(function() {
@@ -9,7 +9,7 @@
         });
 
         function showHideButton() {
-            if ($('#Root_Mailblock').is(':visible')) {
+            if ($('#Root_Mailblock_set').is(':visible')) {
                 $('#Form_EditForm_action_mailblockTestEmail').show();
             }
             else {
@@ -18,3 +18,4 @@
         }
     })
 })(jQuery);
+

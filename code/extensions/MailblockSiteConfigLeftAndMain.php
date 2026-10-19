@@ -20,7 +20,7 @@ class MailblockSiteConfigLeftAndMain extends Extension
         }
     }
 
-    public function init()
+    public function onInit()
     {
         Requirements::javascript("signify-nz/silverstripe-mailblock:javascript/mailblock.js");
     }
