@@ -1,10 +1,15 @@
 (function($) {
     $(document).ready(function(){
         showHideButton();
-        $('.cms-tabset-nav-primary li').on('click', showHideButton);
-        
+        $(document).on('shown.bs.tab click', '.nav-tabs .nav-link', function() {
+            setTimeout(showHideButton, 0);
+        });
+        $(document).ajaxComplete(function() {
+            setTimeout(showHideButton, 0);
+        });
+
         function showHideButton() {
-            if ($('#Root_Mailblock_set').is(':visible')) {
+            if ($('#Root_Mailblock').is(':visible')) {
                 $('#Form_EditForm_action_mailblockTestEmail').show();
             }
             else {

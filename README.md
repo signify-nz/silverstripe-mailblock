@@ -21,6 +21,14 @@ composer require signify-nz/silverstripe-mailblock
 
 All options are in the Settings -> Mailblock section of the CMS. Only users with the "Access to 'Mailblock' settings" permission will be able to configure Mailblock.
 
+To isolate 'Send Test Email' to Mailblock tab only, add the following configuration:
+
+```
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_javascript:
+    - signify-nz/silverstripe-mailblock:javascript/mailblock.js
+```
+
 ## Limitations
 
 This module works by adding an additional Symfony mailer (the Mailer included with SilverStripe) event subscriber. If you are using a custom mailer, no email recipient rewriting will take place.
